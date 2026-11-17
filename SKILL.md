@@ -22,6 +22,21 @@ Why: viewers remember actions, not captions. If you mute the video it should sti
 7. **SFX on every action** (`engine/sfx.py`): pop, whoosh, squish, dab, plip, tick, boing, pour — logged during render as `(time, kind)` so they're frame-accurate. Soft music bed under VO. Loudness-normalise to −16 LUFS.
 8. **Preview before full render.** Render 6–8 still frames (`PREVIEW=12,40,80…`), contact-sheet them, LOOK at them, fix, then render. Send progress (frames, sample) to the person as you go.
 
+## Characters that ACT: pose packs (read this before animating any character)
+**Never build characters out of SVG / vector shapes / code-drawn puppets.** The person hates that look and it reads as clip-art. Rigging one cut-out with rotating limbs also looks stiff ("characters are still, they're doing nothing"). What works (rigpop-motion method, `engine/posepack.py` + `engine/sheets.py`):
+
+1. **Design the character once** (full body, AI image, transparent). This is the master reference.
+2. **Generate a POSE PACK: 5–10 key poses per character per scene**, one image each, with the master as the FIRST reference image and the prompt "same character, same size, same position in frame and same framing as the first reference … POSE: <acting beat>". Because the model copies the first reference's canvas, every pose comes out REGISTERED (same canvas size, same scale, feet on the same baseline) and can be swapped with zero drift. Check with `alpha_bbox`: bottoms should match within a few px; fix outliers with `fix_scale` or regenerate with the registered pose as first ref.
+   - Act the beats, not the words: wave, proud, look-up, worried, flinch, smug, flail, grope, slump, giggle, photo, shrug, arms-up, zen…
+   - If an output comes back at a different canvas size or fully opaque (keying failed), regenerate it with a registered pose as first ref. Always check `(alpha>40).mean()`; 1.0 means no transparency.
+3. **Animate with hard cuts between poses** (`seq(t, [(t0,'pose'),…])`), never cross-dissolves. `Cast.draw` keeps every pose alive: breathing, slow sway, a squash "pop" on each cut, bob; add per-pose wobble/shake/rot for acting.
+4. **Cycles (walk / run) = sprite sheets.** Pass a blank WIDE canvas (e.g. 2400×700 #00FF00) as the FIRST reference and the character pose as the second; ask for "exactly N frames in one horizontal row, strict side view facing RIGHT, feet on one baseline, no ground line". `slice_sheet(path, N)` cuts it into registered frames (blobs assigned by centre, floor lines removed, torso-centred). Drop frames whose arms differ from the rest (they flicker). Walk ≈ 6 fps per frame at ~175 px/s for a 370 px tall character; run ≈ 12 fps at ~600 px/s.
+5. **Props follow anchors.** Measure an anchor once in source pixels (dome centre, hand, phone) and call `cast.world(anchor)` after drawing; props, FX, fog, stars attach there, so they track every pose and lean.
+6. **Locations = wide panoramas.** Pass a blank wide canvas (2400×768) as FIRST ref + an existing style frame as second → a side-scroller strip (~3:1). Scale to 1080 high and move a camera over it: tracking wide shots, hard cut to a 1.6–1.8× medium shot for the gag. Character poses for a side-scroller are side views; generate them at the same scale as the walk frames.
+7. Squash the pose on impacts (`sq=(0.9,1.04)`), camera shake, white flash frame, impact lines, orbiting stars; procedural rain/fog/flash on top.
+
+Reference renders: `examples/posepack/metro_scene.py` (3 seated characters, 22 key poses, props on anchors) and `examples/posepack/street_scene.py` (walk cycle, run cycle, panorama camera, rain, fog, bonk).
+
 ## Animation principles to always apply
 - **Anticipation → action → follow-through.** Brush lifts slightly before diving in; arch overshoots and squashes on landing.
 - **Squash & stretch** on every landing/impact (`squash()`), pop-in overshoot on every appearance (`back()`, `POP`).
@@ -41,8 +56,8 @@ Why: viewers remember actions, not captions. If you mute the video it should sti
 | 3D toy | glossy soft 3D, pastel | smooth, bouncy overshoot |
 
 ## Honest limits (tell the person up front)
-- Frame-by-frame hand-drawn acting (expressive faces, full body turns) and lip-sync are not achievable with this method. Rigged cut-out characters (limb rotation, blinks, head tilt, walk cycles via parts) get ≈80% of the feel.
-- AI image gen won't keep a character 100% identical across many poses: generate parts once and reuse them.
+- Acting comes from AI-drawn key poses (pose packs) + cycles, not from rotating vector limbs. Lip-sync needs mouth patches per pose (not built yet).
+- AI image gen drifts a little between poses: always pass the master pose as the FIRST reference and check registration; regenerate outliers instead of hiding them.
 - Facts on screen (dosages, numbers) must be checked by a human expert before publishing.
 
 ## Workflow rules
@@ -56,11 +71,14 @@ Why: viewers remember actions, not captions. If you mute the video it should sti
 engine/claylib.py    clay text plates (Fredoka font), make_item(), pop curve
 engine/motion.py     easing, squash, paste/pivot/shadow, Path, camera, finish, word_time, ffmpeg_writer
 engine/sfx.py        procedural SFX + pluck music bed + mix()
+engine/posepack.py   pose-pack characters: registered key poses, hard cuts, living-pose warp, cycles, anchors
+engine/sheets.py     slice AI sprite sheets (walk/run) into registered frames
 examples/varnish/    claymation: arch drops in, gauze wipes, brush paints with reveal mask, saliva drips, clock spins
 examples/chai/       desi illustration: kettle tilt + pour stream, cup fill, pods, steam
 examples/rocket/     paper cut-out (12 fps stepped): countdown, smoke particles, camera follow
 examples/sprout/     3D toy: slide-in overshoot, watering, sun rays, growth from base
 examples/vibes/      70s print + deadpan dark humour, built from one style reference
+examples/posepack/   character acting: metro scene (pose packs) + street scene (walk/run, panorama, rain)
 examples/common.py   shared runner: copy a sample folder, replace assets + draw(), run
 fonts/               Fredoka
 ```
