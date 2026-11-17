@@ -1,4 +1,4 @@
-import json,subprocess,sys
+import json,subprocess,sys,os  # set CARTESIA_API_KEY env (or use any TTS)
 lines={'chai':"Masala chai, the desi way. Pour it high, from a brass kettle, straight into a clay kulhad. A pinch of elaichi, a curl of steam, and that's your evening sorted.",
 'rocket':"Three, two, one. The engines roar, the smoke billows out, and up she goes, past the hills, past the clouds, all the way to the stars.",
 'sprout':"Every big tree starts tiny. Drop a seed into the soil, give it a little water, let the sun do its magic, and watch it grow."}
