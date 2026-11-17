@@ -1,0 +1,6 @@
+out_*
+final.mp4
+pv_*.jpg
+sfx.json
+__pycache__/
+*.pyc
