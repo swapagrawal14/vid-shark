@@ -31,6 +31,20 @@ The brush flies in, the gauze wipes, the brush **paints** and the teeth turn amb
 
 ---
 
+## 🎞️ Sample gallery — four styles, four topics
+
+| 🟠 Claymation · *Fluoride varnish* | 🪔 Desi illustration · *Masala chai* |
+|---|---|
+| <img src="docs/media/demo.gif" width="100%"> | <img src="docs/media/chai.gif" width="100%"> |
+| Brush paints, teeth turn amber, saliva drips · [▶️ with sound](docs/media/varnish_sample.mp4) | Kettle pours high, kulhad fills, elaichi drops, steam curls · [▶️ with sound](docs/media/chai_sample.mp4) |
+| ✂️ **Paper cut-out · *Rocket launch*** | 🧸 **3D toy · *Seed to sprout*** |
+| <img src="docs/media/rocket.gif" width="100%"> | <img src="docs/media/sprout.gif" width="100%"> |
+| 3-2-1 slams in, paper smoke billows, camera follows it to the stars · [▶️ with sound](docs/media/rocket_sample.mp4) | Pot slides in, seed bounces, can waters, sun rises, sprout springs up · [▶️ with sound](docs/media/sprout_sample.mp4) |
+
+Every sample: same engine, different asset prompts. Voiceover synced, SFX on every action.
+
+---
+
 ## ❌ Not this → ✅ This
 
 | Slideshow (what most AI "explainers" do) | vid-shark |
@@ -79,6 +93,11 @@ pip install -r requirements.txt        # needs ffmpeg on PATH
 cd examples/varnish
 PREVIEW=40,110,185,250 python3 render.py   # quick stills
 python3 render.py && python3 audio.py      # → final.mp4
+
+# the other samples render + mix in one go
+cd ../chai   && python3 render.py   # desi illustration
+cd ../rocket && python3 render.py   # paper cut-out
+cd ../sprout && python3 render.py   # 3D toy
 ```
 
 ## 📁 Inside
@@ -88,7 +107,12 @@ SKILL.md              the playbook an agent follows: rules, pipeline, styles, li
 engine/motion.py      easing, squash, paste/pivot/shadow, paths, camera, film finish
 engine/sfx.py         procedural SFX + music bed + mixer (no sample files needed)
 engine/claylib.py     clay-style label plates
-examples/varnish/     full worked scene with assets and voiceover
+examples/common.py    shared scene runner (camera, finish, render loop, audio mix)
+examples/varnish/     claymation scene: arch, gauze, brush, reveal mask, saliva, clock
+examples/chai/        desi illustration: pour stream, cup fill, falling pods, steam
+examples/rocket/      paper cut-out: countdown, smoke particles, camera follow, star streaks
+examples/sprout/      3D toy: slide-in, seed bounce, watering, sun rays, growth
+examples/tts.py       voiceover via Cartesia (swap in any TTS)
 ```
 
 ## ⚠️ Honest limits

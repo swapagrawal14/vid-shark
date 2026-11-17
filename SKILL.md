@@ -56,7 +56,11 @@ Why: viewers remember actions, not captions. If you mute the video it should sti
 engine/claylib.py    clay text plates (Fredoka font), make_item(), pop curve
 engine/motion.py     easing, squash, paste/pivot/shadow, Path, camera, finish, word_time, ffmpeg_writer
 engine/sfx.py        procedural SFX + pluck music bed + mix()
-examples/varnish/    full worked scene: arch drops in, gauze wipes, brush paints with reveal mask, saliva drips, clock spins
+examples/varnish/    claymation: arch drops in, gauze wipes, brush paints with reveal mask, saliva drips, clock spins
+examples/chai/       desi illustration: kettle tilt + pour stream, cup fill, pods, steam
+examples/rocket/     paper cut-out (12 fps stepped): countdown, smoke particles, camera follow
+examples/sprout/     3D toy: slide-in overshoot, watering, sun rays, growth from base
+examples/common.py   shared runner: copy a sample folder, replace assets + draw(), run
 fonts/               Fredoka
 ```
 
