@@ -13,7 +13,14 @@ def tick():   t, e = _env(.04, 150); return np.sin(2 * np.pi * 2500 * t) * e * .
 def boing():  t, e = _env(.35, 8); f = 220 + 120 * np.sin(t * 60) * np.exp(-t * 6); return np.sin(2 * np.pi * np.cumsum(f) / SR) * e * .2
 def pour(sec=1.0):
     L = int(sec * SR); n = np.convolve(_r.standard_normal(L), np.ones(8) / 8, 'same'); m = 0.6 + 0.4 * np.sin(np.arange(L) / SR * 40); return n * m * .08
-FX = dict(pop=pop, squish=squish, whoosh=whoosh, dab=dab, plip=plip, tick=tick, boing=boing, pour=pour)
+def thunder():
+    L = int(1.6 * SR); n = _r.standard_normal(L); k = np.convolve(n, np.ones(60) / 60, 'same'); t = np.arange(L) / SR
+    crack = _r.standard_normal(int(.08 * SR)) * np.exp(-np.arange(int(.08 * SR)) / SR * 40) * .5
+    out = k * np.exp(-t * 2.2) * (1 + .5 * np.sin(t * 9)) * 1.4; out[:len(crack)] += crack; return out * .6
+def ring():
+    t = np.arange(int(.5 * SR)) / SR; g = (np.sin(2 * np.pi * 22 * t) > 0).astype(np.float32)
+    return (np.sin(2 * np.pi * 1300 * t) + .6 * np.sin(2 * np.pi * 1700 * t)) * g * np.exp(-t * 1.5) * .07
+FX = dict(thunder=thunder, ring=ring, pop=pop, squish=squish, whoosh=whoosh, dab=dab, plip=plip, tick=tick, boing=boing, pour=pour)
 
 def pluck_bed(dur, vol=.03, bpm=120):
     notes = [261.63, 293.66, 329.63, 392.0, 440.0, 523.25]; prog = [[0, 2, 4], [1, 3, 5], [0, 2, 3], [2, 4, 5]]

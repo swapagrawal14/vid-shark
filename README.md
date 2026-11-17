@@ -41,6 +41,9 @@ The brush flies in, the gauze wipes, the brush **paints** and the teeth turn amb
 | <img src="docs/media/rocket.gif" width="100%"> | <img src="docs/media/sprout.gif" width="100%"> |
 | 3-2-1 slams in, paper smoke billows, camera follows it to the stars · [▶️ with sound](docs/media/rocket_sample.mp4) | Pot slides in, seed bounces, can waters, sun rises, sprout springs up · [▶️ with sound](docs/media/sprout_sample.mp4) |
 
+| 🕺 **70s groovy print + deadpan dark humour · *Good Vibes Only*** | |
+| <img src="docs/media/vibes.gif" width="100%"> | Made from **one style reference** (a 70s poster). He meditates, unbothered, while the phone rings (*"it's just your landlord"*), a cloud rains on him (*"it's just your career"*) and lightning fries the sunflower. · [▶️ with sound](docs/media/vibes_sample.mp4) |
+
 Every sample: same engine, different asset prompts. Voiceover synced, SFX on every action.
 
 ---
@@ -112,6 +115,7 @@ examples/varnish/     claymation scene: arch, gauze, brush, reveal mask, saliva,
 examples/chai/        desi illustration: pour stream, cup fill, falling pods, steam
 examples/rocket/      paper cut-out: countdown, smoke particles, camera follow, star streaks
 examples/sprout/      3D toy: slide-in, seed bounce, watering, sun rays, growth
+examples/vibes/       style + humour from one reference: 70s print, deadpan dark comedy, rain, lightning, char
 examples/tts.py       voiceover via Cartesia (swap in any TTS)
 ```
 

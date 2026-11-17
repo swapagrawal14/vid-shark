@@ -60,6 +60,7 @@ examples/varnish/    claymation: arch drops in, gauze wipes, brush paints with r
 examples/chai/       desi illustration: kettle tilt + pour stream, cup fill, pods, steam
 examples/rocket/     paper cut-out (12 fps stepped): countdown, smoke particles, camera follow
 examples/sprout/     3D toy: slide-in overshoot, watering, sun rays, growth from base
+examples/vibes/      70s print + deadpan dark humour, built from one style reference
 examples/common.py   shared runner: copy a sample folder, replace assets + draw(), run
 fonts/               Fredoka
 ```
@@ -77,3 +78,12 @@ python3 render.py && python3 audio.py      # → final.mp4
 2. Compute key times from VO words.
 3. Per step: `fr = camera(...)` → draw layers back-to-front with their motion functions → particles → labels (small) → `finish(fr, step)`.
 4. Append `(t, 'pop'|'whoosh'|...)` to SFX at each action; dump to sfx.json; `sfx.mix()` + ffmpeg mux.
+
+
+## From a style reference (art style + humour)
+
+When given a reference image (Pinterest pin, poster, frame), copy **two** things, not one:
+1. **Look**: palette, outline weight, texture/grain, lettering, how backgrounds are built. Pass the reference as `image_paths` to every asset generation so all cutouts match.
+2. **Tone / humour**: what makes it funny or eerie (deadpan, dark sarcasm, absurd, wholesome). Write the VO and the gags around it, and let the *motion* deliver the joke: the calm character stays calm while the world falls apart around him; timing beats (pause, then the punchline action).
+
+Steps: read the reference -> name its style + tone in one line -> write a 10-15 s script with 3 escalating beats and a button ending -> generate bg + 4-6 cutouts with the reference -> time actions to the VO's measured pauses (sentence starts from the energy envelope beat word_time for comic timing) -> stepped fps if the style is print/cut-out. Never commit the reference image itself (it's someone else's art). See `examples/vibes/`.
