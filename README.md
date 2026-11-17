@@ -1,10 +1,101 @@
-# Layered Motion Video — agent skill
+<p align="center">
+  <img src="docs/media/banner.jpg" alt="vid-shark — motion-graphics videos where things actually move" width="100%">
+</p>
 
-Give this repo link to any coding agent (Claude Code, Codex, Cursor, Hark…) and say:
-> "Read SKILL.md and make me a motion-graphics video about <topic> in <style>."
+<p align="center">
+  <b>An agent skill for making real motion-graphics videos — where the objects and characters themselves move.</b><br>
+  Any style · any topic · synced to voiceover · procedural SFX · one command to render
+</p>
 
-It makes videos where the objects and characters themselves animate (bounce, pour, paint, drip), synced to voiceover, in any style: claymation, desi illustration, paper cut-out, 3D toy.
+<p align="center">
+  <img src="https://img.shields.io/badge/agent-skill-E27056?style=for-the-badge">
+  <img src="https://img.shields.io/badge/python-3.9+-40A096?style=for-the-badge">
+  <img src="https://img.shields.io/badge/output-1080p%20MP4-F0B446?style=for-the-badge">
+  <img src="https://img.shields.io/badge/styles-clay%20·%20desi%20·%20paper%20·%203D-9678C8?style=for-the-badge">
+</p>
 
-Sample: `examples/varnish` — fluoride varnish application in claymation.
+---
 
-By Swapnil Agrawal (BDS intern).
+## 🎬 See it move
+
+<p align="center">
+  <img src="docs/media/demo.gif" alt="Claymation demo: brush paints fluoride varnish onto a clay tooth arch" width="80%">
+</p>
+
+The brush flies in, the gauze wipes, the brush **paints** and the teeth turn amber behind it, saliva drops fall and splat, the clock spins — all timed to the voiceover words.
+▶️ **[Watch the full 22 s sample with sound](docs/media/varnish_sample.mp4)**
+
+<p align="center">
+  <img src="docs/media/frames.jpg" alt="Six frames from the sample scene" width="100%">
+</p>
+
+---
+
+## ❌ Not this → ✅ This
+
+| Slideshow (what most AI "explainers" do) | vid-shark |
+|---|---|
+| Static background | Background with slow camera push + stop-motion jitter |
+| Text boxes popping up | Objects **perform the action** the voiceover describes |
+| Silence or one music loop | A sound on every action: pop, whoosh, squish, plip, tick, pour |
+| Captions carry the story | Mute it and it still explains itself |
+
+---
+
+## 🚀 Use it with any agent
+
+Give the repo link to Claude Code, Codex, Cursor, Hark, or any coding agent and say:
+
+```text
+Read SKILL.md from https://github.com/swapagrawal14/vid-shark
+and make me a 30-second motion-graphics video on <topic> in <style> style.
+```
+
+The agent writes the script, makes the voiceover, generates every object as a separate cut-out layer, animates them in code, adds SFX and music, and renders a 1080p MP4.
+
+## 🎨 Styles
+
+| 🟠 Claymation | 🪔 Desi flat illustration | ✂️ Paper cut-out | 🧸 3D toy |
+|---|---|---|---|
+| Plasticine, fingerprint texture, animated "on twos" | Bold Indian illustration, jharokha frames, pour & peel actions | Layered paper, hinged joints, stepped motion | Glossy pastel, bouncy overshoot |
+
+## ⚙️ How it works
+
+```text
+script ─▶ voiceover ─▶ style frame ─▶ cut-out layers ─▶ animate in code ─▶ SFX + music ─▶ MP4
+            (TTS)       (1 plate)      (1 per object)    (synced to words)   (−16 LUFS)
+```
+
+- **Squash & stretch** on every landing, **overshoot pops** on every entrance
+- **Paths and arcs** for tools, **pivot rotation** for brushes and limbs
+- **Reveal masks** for state changes (teeth turning amber, a glass filling)
+- **Particles**: drops, splats, sparkles
+- **Preview stills first**, then render the full scene
+
+## 🏃 Run the example
+
+```bash
+pip install -r requirements.txt        # needs ffmpeg on PATH
+cd examples/varnish
+PREVIEW=40,110,185,250 python3 render.py   # quick stills
+python3 render.py && python3 audio.py      # → final.mp4
+```
+
+## 📁 Inside
+
+```text
+SKILL.md              the playbook an agent follows: rules, pipeline, styles, limits
+engine/motion.py      easing, squash, paste/pivot/shadow, paths, camera, film finish
+engine/sfx.py         procedural SFX + music bed + mixer (no sample files needed)
+engine/claylib.py     clay-style label plates
+examples/varnish/     full worked scene with assets and voiceover
+```
+
+## ⚠️ Honest limits
+
+- No frame-by-frame hand-drawn acting or lip-sync. Rigged cut-out characters (limbs, blinks, head tilts) get about 80% of that feel.
+- Facts on screen should be checked by a human expert before publishing.
+
+---
+
+<p align="center">Made by <b>Swapnil Agrawal (BDS intern)</b> · <a href="https://github.com/swapagrawal14">@swapagrawal14</a></p>
