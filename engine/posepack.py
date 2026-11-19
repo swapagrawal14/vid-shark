@@ -95,3 +95,59 @@ class Cast:
         img = xform(im, sx, sy) if (abs(sx - 1) > 1e-3 or abs(sy - 1) > 1e-3) else im
         piv2 = (piv[0] * img.width / im.width, piv[1] * img.height / im.height)
         place_pivot(fr, img, self.x + dx, self.floor + dy + by, piv2, r)
+
+
+# ---------------------------------------------------------------- cut-out QA helpers (see AGENTS.md QA gates)
+def alpha_coverage(im, thr=40):
+    """fraction of the canvas that is opaque. ~1.0 means keying failed (no transparency): regenerate.
+    A healthy full-body cut-out is usually 0.05-0.6."""
+    return float((np.array(im.convert('RGBA'))[..., 3] > thr).mean())
+
+
+def despill_edge(im, ring_px=4):
+    """Kill green-screen spill/halo on a cut-out's outline: clamp G to max(R, B) inside an edge ring of
+    ring_px, and erode alpha by 1 px. Apply at load time to any cut-out keyed off #00FF00."""
+    a = np.array(im.convert('RGBA')); al = a[..., 3]; m = (al > 8).astype(np.uint8)
+    ring = (m - cv2.erode(m, np.ones((2 * ring_px + 1,) * 2, np.uint8))).astype(bool)
+    rgb = a[..., :3].astype(np.int16); g = np.minimum(rgb[..., 1], np.maximum(rgb[..., 0], rgb[..., 2]))
+    a[..., 1] = np.where(ring, g, rgb[..., 1]).astype(np.uint8)
+    a[..., 3] = cv2.erode(al, np.ones((3, 3), np.uint8))
+    return Image.fromarray(a, 'RGBA')
+
+
+def green_fringe(im, ring_px=4, thr=40):
+    """share of edge-ring pixels that are green-dominant (G > max(R,B) + 25). > ~0.05 = visible halo: despill."""
+    a = np.array(im.convert('RGBA')); m = (a[..., 3] > thr).astype(np.uint8)
+    ring = (m - cv2.erode(m, np.ones((2 * ring_px + 1,) * 2, np.uint8))).astype(bool)
+    if not ring.any(): return 0.0
+    r, g, b = [a[..., i].astype(np.int16)[ring] for i in range(3)]
+    return float((g > np.maximum(r, b) + 25).mean())
+
+
+def check_registration(paths, base_tol=6, height_tol=0.04, thr=40):
+    """Pose-pack registration report. paths: list of pose PNGs meant to share one canvas.
+    Checks: same canvas size, feet baseline (alpha bottom) within base_tol px of the median, figure height
+    within height_tol of the median (fix with Cast(fix_scale=...) or regenerate), alpha coverage, green fringe.
+    Returns (rows, problems) where rows = [dict(name, size, bottom, height, coverage, fringe)]."""
+    rows = []
+    for p in paths:
+        im = Image.open(p).convert('RGBA'); x0, y0, x1, y1 = alpha_bbox(im, thr)
+        rows.append(dict(name=os.path.basename(p), size=im.size, bottom=int(y1), height=int(y1 - y0),
+                         coverage=round(alpha_coverage(im, thr), 3), fringe=round(green_fringe(im), 3)))
+    sizes = {r['size'] for r in rows}; mb = float(np.median([r['bottom'] for r in rows]))
+    mh = float(np.median([r['height'] for r in rows])); probs = []
+    if len(sizes) > 1: probs.append(f'canvas sizes differ: {sorted(sizes)} (regenerate with a registered pose as FIRST ref)')
+    for r in rows:
+        if abs(r['bottom'] - mb) > base_tol: probs.append(f"{r['name']}: feet at y={r['bottom']} vs median {mb:.0f}")
+        if abs(r['height'] / mh - 1) > height_tol: probs.append(f"{r['name']}: height {r['height']} vs median {mh:.0f} (fix_scale {mh / r['height']:.3f})")
+        if r['coverage'] > 0.95: probs.append(f"{r['name']}: no transparency (coverage {r['coverage']}), keying failed")
+        if r['fringe'] > 0.05: probs.append(f"{r['name']}: green fringe {r['fringe']:.0%} of edge, run despill_edge")
+    return rows, probs
+
+
+if __name__ == '__main__':                                  # python3 engine/posepack.py girl/girl_*.png
+    import sys, glob
+    files = sorted(f for a in sys.argv[1:] for f in glob.glob(a))
+    rows, probs = check_registration(files)
+    for r in rows: print(r)
+    print('\n'.join(probs) if probs else 'registration OK')

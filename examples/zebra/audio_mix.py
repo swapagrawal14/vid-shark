@@ -8,9 +8,11 @@
   * Full mix two-pass loudnorm'd to -16 LUFS / -1.5 dBTP afterwards (done in scene.py at mux time).
   * verify() measures VO-only vs bed-only loudness over the VO windows (gap must be >= 10 dB).
 
+Generic version for new videos: engine/mix.py (Mix builder, verify(), check(), loudnorm_filter()).
 Loudness is measured with ffmpeg's ebur128 (BS.1770) on temp wavs, so no extra python deps."""
-import os, re, wave, subprocess, tempfile
+import os, sys
 import numpy as np
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'engine'))
 
 SR = 44100
 DUCK_DB, FOLEY_DB = 10.0, 6.0
@@ -28,57 +30,8 @@ SFX = {
 DUCKED = ('horn', 'whoosh', 'cycle', 'laugh', 'cheer')   # these follow the music/ambience duck
 
 
-def read(path):
-    w = wave.open(path); a = np.frombuffer(w.readframes(w.getnframes()), np.int16).astype(np.float32) / 32768
-    return a if w.getnchannels() == 1 else a.reshape(-1, w.getnchannels()).mean(1)
-
-
-def write(path, a):
-    with wave.open(path, 'wb') as w:
-        w.setnchannels(1); w.setsampwidth(2); w.setframerate(SR)
-        w.writeframes((np.clip(a, -1, 1) * 32767).astype(np.int16).tobytes())
-
-
-def lufs(a):
-    """integrated loudness (LUFS) + true peak (dBFS) of a mono float array via ffmpeg ebur128"""
-    if np.abs(a).max() < 1e-6: return -120.0, -120.0
-    if len(a) < int(0.5 * SR): a = np.pad(a, (0, int(0.5 * SR) - len(a)))   # BS.1770 needs >= one 400 ms block
-    with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as f: p = f.name
-    write(p, a)
-    out = subprocess.run(['ffmpeg', '-hide_banner', '-nostats', '-i', p, '-af', 'ebur128=peak=true', '-f', 'null', '-'],
-                         capture_output=True, text=True).stderr
-    os.unlink(p)
-    summ = out[out.rindex('Summary:'):]
-    I = float(re.search(r'I:\s+(-?[\d.]+|-inf) LUFS', summ).group(1).replace('-inf', '-120'))
-    pk = float(re.search(r'Peak:\s+(-?[\d.]+|-inf) dBFS', summ).group(1).replace('-inf', '-120'))
-    return I, pk
-
-
-def ffilter(a, af):
-    """run a mono float array through an ffmpeg audio filter chain"""
-    with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as f: p = f.name
-    q = p[:-4] + '_o.wav'; write(p, a)
-    subprocess.run(['ffmpeg', '-y', '-v', 'error', '-i', p, '-af', af, '-ar', str(SR), '-ac', '1', q], check=True)
-    b = read(q); os.unlink(p); os.unlink(q)
-    return np.pad(b, (0, max(0, len(a) - len(b))))[:len(a)]
-
-
-def to_lufs(a, target):
-    I, _ = lufs(a)
-    return a * 10 ** ((target - I) / 20)
-
-
-def vo_envelope(vo, thresh_db=-38, att=0.080, rel=0.300):
-    """0..1 'VO is speaking' control: 5 ms RMS frames above (peak + thresh_db), one-pole 80 ms attack / 300 ms release"""
-    hop = int(0.005 * SR); n = len(vo) // hop + 1
-    pad = np.pad(vo, (0, n * hop - len(vo)))
-    rms = np.sqrt((pad.reshape(n, hop) ** 2).mean(1) + 1e-12); db = 20 * np.log10(rms)
-    gate = (db > db.max() + thresh_db).astype(np.float32)
-    ka, kr = 1 - np.exp(-hop / SR / att), 1 - np.exp(-hop / SR / rel)
-    env = np.zeros(n, np.float32); e = 0.0
-    for i in range(n):
-        g = gate[i]; e += (ka if g > e else kr) * (g - e); env[i] = e
-    return np.interp(np.arange(len(vo)), np.arange(n) * hop, env).astype(np.float32), gate, hop
+# shared helpers live in engine/mix.py (generalised from this file); the zebra-specific build() stays here
+from mix import read, write, lufs, ffilter, to_lufs, vo_envelope, verify   # noqa: F401  (verify re-exported for scene.py)
 
 
 def build(dur, au, vt, vo_at, events, t_cut, out_path, stems_dir=None):
@@ -139,18 +92,3 @@ def build(dur, au, vt, vo_at, events, t_cut, out_path, stems_dir=None):
     if stems_dir:
         os.makedirs(stems_dir, exist_ok=True); write(stems_dir + '/vo.wav', vo); write(stems_dir + '/bed.wav', bed)
     return vo, bed, env
-
-
-def verify(vo, bed, env, final_wav=None):
-    """VO-vs-bed gap over the VO windows, bed level in the gaps, and final-mix numbers"""
-    on = env > 0.5
-    r = {}
-    r['vo_only_I'] = lufs(vo)[0]
-    r['bed_only_I'] = lufs(bed)[0]
-    r['vo_in_vo_windows'] = lufs(vo[on])[0]
-    r['bed_in_vo_windows'] = lufs(bed[on])[0]
-    r['bed_in_gaps'] = lufs(bed[~on])[0]
-    r['gap_db'] = r['vo_in_vo_windows'] - r['bed_in_vo_windows']
-    if final_wav:
-        a = read(final_wav); I, pk = lufs(a); r['final_I'], r['final_peak'] = I, pk
-    return r

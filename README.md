@@ -14,6 +14,8 @@
   <img src="https://img.shields.io/badge/styles-clay%20·%20desi%20·%20paper%20·%203D-9678C8?style=for-the-badge">
 </p>
 
+> 🤖 **Agents start here:** [AGENTS.md](AGENTS.md): prerequisites, what to ask first, the step-by-step pipeline, QA gates and rules.
+
 ---
 
 ## 🎬 See it move
@@ -31,7 +33,7 @@ The brush flies in, the gauze wipes, the brush **paints** and the teeth turn amb
 
 ---
 
-## 🎞️ Sample gallery — four styles, four topics
+## 🎞️ Sample gallery — six samples, five styles
 
 | 🟠 Claymation · *Fluoride varnish* | 🪔 Desi illustration · *Masala chai* |
 |---|---|
@@ -67,7 +69,7 @@ Every sample: same engine, different asset prompts. Voiceover synced, SFX on eve
 Give the repo link to Claude Code, Codex, Cursor, Hark, or any coding agent and say:
 
 ```text
-Read SKILL.md from https://github.com/swapagrawal14/vid-shark
+Read AGENTS.md and SKILL.md from https://github.com/swapagrawal14/vid-shark
 and make me a 30-second motion-graphics video on <topic> in <style> style.
 ```
 
@@ -109,8 +111,13 @@ cd ../sprout && python3 render.py   # 3D toy
 ## 📁 Inside
 
 ```text
+AGENTS.md             agent quickstart: prereqs, questions, pipeline, QA gates, rules
 SKILL.md              the playbook an agent follows: rules, pipeline, styles, limits
 engine/motion.py      easing, squash, paste/pivot/shadow, paths, camera, film finish
+engine/posepack.py    pose-pack characters (hard cuts, living poses, cycles, anchors) + cut-out QA (alpha, despill, registration)
+engine/sheets.py      sprite-sheet slicer, mirror-legs-below-hem, cycle fps, walk-check contact sheet
+engine/mix.py         VO-led loudness-aware mix: per-SFX targets, ducking, limiter, verify(), linear loudnorm
+engine/chunkrender.py parallel chunked rendering (warm-up frames, concat, audio mux) for short shell timeouts
 engine/sfx.py         procedural SFX + music bed + mixer (no sample files needed)
 engine/claylib.py     clay-style label plates
 examples/common.py    shared scene runner (camera, finish, render loop, audio mix)

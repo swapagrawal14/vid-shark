@@ -5,22 +5,12 @@ import math, random
 import numpy as np, cv2
 from PIL import Image
 from motion import ease, ease_out, back, squash, paste, place_pivot, clamp, xform
-from posepack import Cast, seq, alpha_bbox
+from posepack import Cast, seq, alpha_bbox, despill_edge     # despill_edge moved to the engine
 
 W, H = 1920, 1080
 S = 1080 / 768                                     # tapri_bg source px -> world px
 ZT = 2.0                                           # sprites prescaled for the close-up
 KETTLE_TILT = 0.0                                  # kettle stays still on the stove (chai pours from the spout)
-
-
-def despill_edge(im, ring_px=4):
-    """Kill green-screen spill on a cut-out's outline: clamp G to max(R, B) inside an edge ring, erode alpha 1 px."""
-    a = np.array(im); al = a[..., 3]; m = (al > 8).astype(np.uint8)
-    ring = (m - cv2.erode(m, np.ones((2 * ring_px + 1,) * 2, np.uint8))).astype(bool)
-    rgb = a[..., :3].astype(np.int16); g = np.minimum(rgb[..., 1], np.maximum(rgb[..., 0], rgb[..., 2]))
-    a[..., 1] = np.where(ring, g, rgb[..., 1]).astype(np.uint8)
-    a[..., 3] = cv2.erode(al, np.ones((3, 3), np.uint8))
-    return Image.fromarray(a, 'RGBA')
 
 
 def star(fr, x, y, r, col=(80, 210, 250)):

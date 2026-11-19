@@ -6,6 +6,8 @@ author: Swapnil Agrawal (BDS intern)
 
 # Layered Motion Video
 
+> **Agents:** start with [AGENTS.md](AGENTS.md) (prerequisites, what to ask first, step-by-step pipeline, **QA gates**, rules). This file is the craft playbook.
+
 ## The one rule
 **Things move, not text boxes.** A slideshow with a static background and text plates popping up is NOT motion graphics.
 In every shot something physical must be *doing the action the voiceover describes*: the brush paints, the gel squeezes out, the drop falls and splats, the clock hand spins, the tray flips and seats. Text is a small supporting label, never the star.
@@ -21,6 +23,8 @@ Why: viewers remember actions, not captions. If you mute the video it should sti
 6. **Animate in code** (`engine/motion.py`): easing, overshoot pop, squash-and-stretch on impact, objects following paths, pivot rotation, particles (drops, sparkles, crumbs), cast shadows, slow camera push, stop-motion jitter, grain and vignette.
 7. **SFX on every action** (`engine/sfx.py`): pop, whoosh, squish, dab, plip, tick, boing, pour — logged during render as `(time, kind)` so they're frame-accurate. Soft music bed under VO. Loudness-normalise to −16 LUFS.
 8. **Preview before full render.** Render 6–8 still frames (`PREVIEW=12,40,80…`), contact-sheet them, LOOK at them, fix, then render. Send progress (frames, sample) to the person as you go.
+9. **Pass the QA gates** in [AGENTS.md §4](AGENTS.md#4-qa-gates-every-video-before-the-human-sees-it) (alpha coverage, despill, pose registration, walk check, contact registration, preview sheet, audio numbers, file size) before anything goes to the person.
+10. **Render in chunks** when shell commands time out: `engine/chunkrender.py` (parallel chunks with warm-up frames, then concat + mux).
 
 ## Characters that ACT: pose packs (read this before animating any character)
 **Never build characters out of SVG / vector shapes / code-drawn puppets.** The person hates that look and it reads as clip-art. Rigging one cut-out with rotating limbs also looks stiff ("characters are still, they're doing nothing"). What works (rigpop-motion method, `engine/posepack.py` + `engine/sheets.py`):
@@ -38,9 +42,9 @@ Why: viewers remember actions, not captions. If you mute the video it should sti
 Reference renders: `examples/posepack/metro_scene.py` (3 seated characters, 22 key poses, props on anchors) and `examples/posepack/street_scene.py` (walk cycle, run cycle, panorama camera, rain, fog, bonk).
 
 ## Lessons (from the zebra-crossing sample)
-- **The VO leads the mix.** Normalise the VO stem *alone* to ~−16 LUFS; music/ambience beds ~−30 LUFS. Sidechain-duck music, ambience, horns and whooshes 8–12 dB off a VO envelope (80 ms attack / 300 ms release). Keep horns and whooshes short (trim to ~0.3–0.9 s) with a per-SFX loudness target instead of one global gain. Before muxing, measure VO-only vs bed-only loudness inside the VO windows: VO must sit **≥10 dB** above the bed, else fix the mix. Then loudnorm the full mix to −16 LUFS. See `examples/zebra/audio_mix.py` (`verify()`).
-- **Never slide a static pose across the ground.** A character moving toward/away from camera needs front/back **stepping sheets** (4-frame walk, 6-frame hurry), registered on the master pose's canvas like any pose pack. If the model keeps drawing the same leg forward in every frame, mirror only the legs below the hem and blend that strip back in for the alternate frames.
-- **Tie cycle fps to ground speed.** Frame rate of a walk/hurry cycle = ground speed ÷ stride length (in the same screen units, scaled with the character), so feet plant instead of skating. Change speed → change fps, not just the path.
+- **The VO leads the mix.** Normalise the VO stem *alone* to ~−16 LUFS; music/ambience beds ~−30 LUFS. Sidechain-duck music, ambience, horns and whooshes 8–12 dB off a VO envelope (80 ms attack / 300 ms release). Keep horns and whooshes short (trim to ~0.3–0.9 s) with a per-SFX loudness target instead of one global gain. Before muxing, measure VO-only vs bed-only loudness inside the VO windows: VO must sit **≥10 dB** above the bed, else fix the mix. Then loudnorm the full mix to −16 LUFS. Reusable version: `engine/mix.py` (`Mix`, `verify()`, `check()`, `loudnorm_filter()`); zebra's own build is `examples/zebra/audio_mix.py`.
+- **Never slide a static pose across the ground.** A character moving toward/away from camera needs front/back **stepping sheets** (4-frame walk, 6-frame hurry), registered on the master pose's canvas like any pose pack. If the model keeps drawing the same leg forward in every frame, mirror only the legs below the hem and blend that strip back in for the alternate frames (`sheets.mirror_legs_below_hem`).
+- **Tie cycle fps to ground speed.** Frame rate of a walk/hurry cycle = ground speed ÷ stride length (in the same screen units, scaled with the character), so feet plant instead of skating (`sheets.cycle_fps`). Change speed → change fps, not just the path.
 
 ## Animation principles to always apply
 - **Anticipation → action → follow-through.** Brush lifts slightly before diving in; arch overshoots and squashes on landing.
@@ -75,9 +79,14 @@ Reference renders: `examples/posepack/metro_scene.py` (3 seated characters, 22 k
 ```
 engine/claylib.py    clay text plates (Fredoka font), make_item(), pop curve
 engine/motion.py     easing, squash, paste/pivot/shadow, Path, camera, finish, word_time, ffmpeg_writer
-engine/sfx.py        procedural SFX + pluck music bed + mix()
-engine/posepack.py   pose-pack characters: registered key poses, hard cuts, living-pose warp, cycles, anchors
-engine/sheets.py     slice AI sprite sheets (walk/run) into registered frames
+engine/sfx.py        procedural SFX + pluck music bed + mix() (simple; prefer engine/mix.py for VO-led videos)
+engine/posepack.py   pose-pack characters: registered key poses, hard cuts, living-pose warp, cycles, anchors;
+                     QA: alpha_coverage, green_fringe, despill_edge, check_registration (CLI)
+engine/sheets.py     slice AI sprite sheets (walk/run) into registered frames; mirror_legs_below_hem, cycle_fps,
+                     contact_sheet (walk-check CLI)
+engine/mix.py        VO-led mix: Mix builder, per-SFX loudness (measured before trim), ducking, master limiter,
+                     verify()/check(), linear two-pass loudnorm_filter() (CLI: verify, loudnorm)
+engine/chunkrender.py parallel chunked frame rendering with warm-up frames, concat + audio mux (CLI)
 examples/varnish/    claymation: arch drops in, gauze wipes, brush paints with reveal mask, saliva drips, clock spins
 examples/chai/       desi illustration: kettle tilt + pour stream, cup fill, pods, steam
 examples/rocket/     paper cut-out (12 fps stepped): countdown, smoke particles, camera follow
@@ -86,6 +95,7 @@ examples/vibes/      70s print + deadpan dark humour, built from one style refer
 examples/posepack/   character acting: metro scene (pose packs) + street scene (walk/run, panorama, rain)
 examples/zebra/      desi illustration + Hinglish VO: front/back stepping sheets, traffic, tapri pose packs, VO-led ducked mix
 examples/common.py   shared runner: copy a sample folder, replace assets + draw(), run
+AGENTS.md            agent quickstart + QA gates
 fonts/               Fredoka
 ```
 
