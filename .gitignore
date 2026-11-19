@@ -4,3 +4,16 @@ pv_*.jpg
 sfx.json
 __pycache__/
 *.pyc
+
+# examples/zebra: generated art + audio stay local (regenerate per examples/zebra/README.md)
+examples/zebra/assets/
+examples/zebra/girl/
+examples/zebra/street/
+examples/zebra/tapri/
+examples/zebra/stems/
+examples/zebra/pv/
+examples/zebra/mix.wav
+examples/zebra/check_*.png
+examples/zebra/preview_sheet.png
+examples/zebra/audio/*.wav
+!examples/zebra/audio/vo.wav

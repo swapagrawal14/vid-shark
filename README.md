@@ -44,6 +44,9 @@ The brush flies in, the gauze wipes, the brush **paints** and the teeth turn amb
 | 🕺 **70s groovy print + deadpan dark humour · *Good Vibes Only*** | |
 | <img src="docs/media/vibes.gif" width="100%"> | Made from **one style reference** (a 70s poster). He meditates, unbothered, while the phone rings (*"it's just your landlord"*), a cloud rains on him (*"it's just your career"*) and lightning fries the sunflower. · [▶️ with sound](docs/media/vibes_sample.mp4) |
 
+| 🚦 **Desi illustration + pose packs · *Zebra crossing*** | |
+| <img src="docs/media/zebra.gif" width="100%"> | She waits out the horns on the median, *"Gap mila... bhaago!"*, hurries across with real stepping cycles, then hard cut to the tapri: friends wave, chai pours into kulhads, hi-fi. Hinglish voiceover, VO-led ducked mix. · [▶️ with sound](docs/media/zebra.mp4) |
+
 Every sample: same engine, different asset prompts. Voiceover synced, SFX on every action.
 
 ---
@@ -116,6 +119,7 @@ examples/chai/        desi illustration: pour stream, cup fill, falling pods, st
 examples/rocket/      paper cut-out: countdown, smoke particles, camera follow, star streaks
 examples/sprout/      3D toy: slide-in, seed bounce, watering, sun rays, growth
 examples/vibes/       style + humour from one reference: 70s print, deadpan dark comedy, rain, lightning, char
+examples/zebra/       pose-pack characters: zebra crossing (stepping cycles, traffic) → chai tapri, Hinglish VO
 examples/tts.py       voiceover via Cartesia (swap in any TTS)
 ```
 

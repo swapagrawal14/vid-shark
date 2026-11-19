@@ -1,0 +1,72 @@
+{
+  "duration": 10.8,
+  "text": "Indian traffic mein road cross karna? Yeh patience ka asli exam hai. Gap mila... bhaago! Aur reward? Doston ke saath garam kulhad chai. Hi-fi!",
+  "language": "hi",
+  "segments": [
+    [
+      0.06,
+      2.05
+    ],
+    [
+      2.52,
+      4.4
+    ],
+    [
+      4.72,
+      5.52
+    ],
+    [
+      5.65,
+      6.68
+    ],
+    [
+      6.85,
+      7.52
+    ],
+    [
+      7.81,
+      9.77
+    ],
+    [
+      9.95,
+      10.58
+    ]
+  ],
+  "sentences": [
+    {
+      "text": "Indian traffic mein road cross karna?",
+      "start": 0.06,
+      "end": 2.05
+    },
+    {
+      "text": "Yeh patience ka asli exam hai.",
+      "start": 2.52,
+      "end": 4.4
+    },
+    {
+      "text": "Gap mila...",
+      "start": 4.72,
+      "end": 5.52
+    },
+    {
+      "text": "bhaago!",
+      "start": 5.65,
+      "end": 6.68
+    },
+    {
+      "text": "Aur reward?",
+      "start": 6.85,
+      "end": 7.52
+    },
+    {
+      "text": "Doston ke saath garam kulhad chai.",
+      "start": 7.81,
+      "end": 9.77
+    },
+    {
+      "text": "Hi-fi!",
+      "start": 9.95,
+      "end": 10.58
+    }
+  ]
+}

@@ -37,6 +37,11 @@ Why: viewers remember actions, not captions. If you mute the video it should sti
 
 Reference renders: `examples/posepack/metro_scene.py` (3 seated characters, 22 key poses, props on anchors) and `examples/posepack/street_scene.py` (walk cycle, run cycle, panorama camera, rain, fog, bonk).
 
+## Lessons (from the zebra-crossing sample)
+- **The VO leads the mix.** Normalise the VO stem *alone* to ~−16 LUFS; music/ambience beds ~−30 LUFS. Sidechain-duck music, ambience, horns and whooshes 8–12 dB off a VO envelope (80 ms attack / 300 ms release). Keep horns and whooshes short (trim to ~0.3–0.9 s) with a per-SFX loudness target instead of one global gain. Before muxing, measure VO-only vs bed-only loudness inside the VO windows: VO must sit **≥10 dB** above the bed, else fix the mix. Then loudnorm the full mix to −16 LUFS. See `examples/zebra/audio_mix.py` (`verify()`).
+- **Never slide a static pose across the ground.** A character moving toward/away from camera needs front/back **stepping sheets** (4-frame walk, 6-frame hurry), registered on the master pose's canvas like any pose pack. If the model keeps drawing the same leg forward in every frame, mirror only the legs below the hem and blend that strip back in for the alternate frames.
+- **Tie cycle fps to ground speed.** Frame rate of a walk/hurry cycle = ground speed ÷ stride length (in the same screen units, scaled with the character), so feet plant instead of skating. Change speed → change fps, not just the path.
+
 ## Animation principles to always apply
 - **Anticipation → action → follow-through.** Brush lifts slightly before diving in; arch overshoots and squashes on landing.
 - **Squash & stretch** on every landing/impact (`squash()`), pop-in overshoot on every appearance (`back()`, `POP`).
@@ -79,6 +84,7 @@ examples/rocket/     paper cut-out (12 fps stepped): countdown, smoke particles,
 examples/sprout/     3D toy: slide-in overshoot, watering, sun rays, growth from base
 examples/vibes/      70s print + deadpan dark humour, built from one style reference
 examples/posepack/   character acting: metro scene (pose packs) + street scene (walk/run, panorama, rain)
+examples/zebra/      desi illustration + Hinglish VO: front/back stepping sheets, traffic, tapri pose packs, VO-led ducked mix
 examples/common.py   shared runner: copy a sample folder, replace assets + draw(), run
 fonts/               Fredoka
 ```
