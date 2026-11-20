@@ -17,3 +17,9 @@ examples/zebra/check_*.png
 examples/zebra/preview_sheet.png
 examples/zebra/audio/*.wav
 !examples/zebra/audio/vo.wav
+
+# examples/pawplay: generated art, previews + audio stay local (regenerate: prep.py, audio.py)
+examples/pawplay/assets/
+examples/pawplay/pv/
+examples/pawplay/stems/
+examples/pawplay/mix.wav

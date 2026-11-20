@@ -33,7 +33,7 @@ The brush flies in, the gauze wipes, the brush **paints** and the teeth turn amb
 
 ---
 
-## 🎞️ Sample gallery — six samples, five styles
+## 🎞️ Sample gallery — seven samples, six styles
 
 | 🟠 Claymation · *Fluoride varnish* | 🪔 Desi illustration · *Masala chai* |
 |---|---|
@@ -49,7 +49,10 @@ The brush flies in, the gauze wipes, the brush **paints** and the teeth turn amb
 | 🚦 **Desi illustration + pose packs · *Zebra crossing*** | |
 | <img src="docs/media/zebra.gif" width="100%"> | She waits out the horns on the median, *"Gap mila... bhaago!"*, hurries across with real stepping cycles, then hard cut to the tapri: friends wave, chai pours into kulhads, hi-fi. Hinglish voiceover, VO-led ducked mix. · [▶️ with sound](docs/media/zebra.mp4) |
 
-Every sample: same engine, different asset prompts. Voiceover synced, SFX on every action.
+| 🐸 **Hand-drawn Korean doodle + pose packs · *Paw Playlists* (no VO)** | |
+| <img src="docs/media/pawplay.gif" width="100%"> | A social-media intro pin brought to life: frog, dog, crow and cat peek in from the edges, the title pops letter by letter, a hamster drops onto it and bounces, a music note bonks from head to head (routed around the type), everyone sings and the button bursts into notes. Whole-frame line boil, ukulele/marimba bed, a sound on every action. · [▶️ with sound](docs/media/pawplay.mp4) |
+
+Every sample: same engine, different asset prompts. Voiceover synced (where there is one), SFX on every action.
 
 ---
 
@@ -127,6 +130,7 @@ examples/rocket/      paper cut-out: countdown, smoke particles, camera follow, 
 examples/sprout/      3D toy: slide-in, seed bounce, watering, sun rays, growth
 examples/vibes/       style + humour from one reference: 70s print, deadpan dark comedy, rain, lightning, char
 examples/zebra/       pose-pack characters: zebra crossing (stepping cycles, traffic) → chai tapri, Hinglish VO
+examples/pawplay/     hand-drawn doodle intro: five pose-pack animals, title pops, bouncing note, music-led mix (no VO)
 examples/tts.py       voiceover via Cartesia (swap in any TTS)
 ```
 

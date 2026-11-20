@@ -94,6 +94,7 @@ examples/sprout/     3D toy: slide-in overshoot, watering, sun rays, growth from
 examples/vibes/      70s print + deadpan dark humour, built from one style reference
 examples/posepack/   character acting: metro scene (pose packs) + street scene (walk/run, panorama, rain)
 examples/zebra/      desi illustration + Hinglish VO: front/back stepping sheets, traffic, tapri pose packs, VO-led ducked mix
+examples/pawplay/    hand-drawn doodle intro (no VO): 5 pose-pack animals, letter pops, note routed around text, line boil, music-led mix
 examples/common.py   shared runner: copy a sample folder, replace assets + draw(), run
 AGENTS.md            agent quickstart + QA gates
 fonts/               Fredoka
